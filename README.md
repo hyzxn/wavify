@@ -69,7 +69,7 @@ audio-dataset-preprocessor/
 ├── audio-dataset-preprocessor.ps1      # Main logic (Requires FFmpeg): Handles conversion & batching
 ├── audio-dataset-preprocessor-ui.png   # Screenshot of UI / PowerShell console progress
 ├── README.md                           # Project documentation
-├── LICENSE                             # License file
+├── LICENSE                             # License file (MIT)
 └── .gitignore                          # Git ignore rules
 ```
 
@@ -129,10 +129,10 @@ finished001/
 
 ```text
 audio-dataset-preprocessor/
-├── run.bat                          # 실행 파일: 전처리 파이프라인 즉시 실행
-├── audio-dataset-preprocessor.ps1   # 메인 로직 (FFmpeg 설치 필요): 오디오 변환 및 배치 처리 담당
-├── audio-dataset-preprocessor-ui.png # 스크린샷: 인터페이스 및 진행 상황 예시
-├── README.md                        # 프로젝트 설명서
-├── LICENSE                          # 라이선스 규정
-└── .gitignore                       # Git 관리 제외 대상 설정
+├── run.bat                              # 실행 파일: 전처리 파이프라인 즉시 실행
+├── audio-dataset-preprocessor.ps1       # 메인 로직 (FFmpeg 설치 필요): 오디오 변환 및 배치 처리 담당
+├── audio-dataset-preprocessor-ui.png    # 스크린샷: 인터페이스 및 진행 상황 예시
+├── README.md                            # 프로젝트 설명서
+├── LICENSE                              # 라이선스 파일 (MIT)
+└── .gitignore                           # Git 관리 제외 대상 설정
 ```
