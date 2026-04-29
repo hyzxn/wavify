@@ -1,4 +1,4 @@
-# audio-dataset-preprocessor
+# Audio Dataset Preprocessor
 
 [![Dependency](https://img.shields.io/badge/Dependency-FFmpeg-orange)](https://ffmpeg.org/)
 [![Release](https://img.shields.io/github/v/release/OnlyCat11/audio-dataset-preprocessor)](https://github.com/OnlyCat11/audio-dataset-preprocessor/releases/latest)
