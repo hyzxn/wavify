@@ -58,11 +58,11 @@ function Convert-AudioDataset {
             $process = Start-Process -FilePath "ffmpeg" -ArgumentList @(
                 "-y", "-nostdin", "-hide_banner",
                 "-analyzeduration", "100M", "-probesize", "100M",
-                "-i", "`"$fFull`"", 
+                "-i", $fFull, 
                 "-ar", $sampleRate, 
                 "-acodec", "pcm_s16le", 
                 "-ac", "1", 
-                "`"$destPath`"", 
+                $destPath, 
                 "-loglevel", "error"
             ) -NoNewWindow -PassThru -Wait
 
