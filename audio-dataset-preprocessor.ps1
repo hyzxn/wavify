@@ -14,8 +14,9 @@ function Convert-AudioDataset {
         return
     }
 
-    $files = Get-ChildItem -Path $SourcePath -File -Include $AudioFormats | Where-Object { $_.DirectoryName -notmatch "finished\d{3}" }
-    $totalCount = $files.Count
+    $searchPath = if ((Test-Path $SourcePath -PathType Container)) { Join-Path $SourcePath "*" } else { $SourcePath }
+    $files = Get-ChildItem -Path $searchPath -File -Include $AudioFormats | Where-Object { $_.DirectoryName -notmatch "finished\d{3}" }
+    $totalCount = @($files).Count
     if ($totalCount -eq 0) {
         Write-Host "Error: No files found." -ForegroundColor Red
         return
@@ -59,7 +60,8 @@ function Convert-AudioDataset {
                 $sharedState.Errors.Add("[$fName] Timeout") | Out-Null
             }
             elseif ($p.ExitCode -ne 0) {
-                $sharedState.Errors.Add("[$fName] FFmpeg Error: $($errTask.Result.Trim())") | Out-Null
+                $errTask.Wait(2000)
+                $sharedState.Errors.Add("... $($errTask.Result.Trim())") | Out-Null
             }
         }
         catch {
