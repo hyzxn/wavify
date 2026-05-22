@@ -45,39 +45,37 @@ function Convert-AudioDataset {
     $scriptBlock = {
         param($fFull, $fName, $destPath, $sharedState, $sampleRate, $timeoutMs)
         try {
-            $p = New-Object System.Diagnostics.Process
-            $p.StartInfo.FileName = "ffmpeg"
-            $p.StartInfo.Arguments = "-y -nostdin -threads 1 -i `"$fFull`" -ar $sampleRate -acodec pcm_s16le -ac 1 `"$destPath`" -loglevel error"
-            $p.StartInfo.UseShellExecute = $false
-            $p.StartInfo.CreateNoWindow = $true
-            $p.StartInfo.RedirectStandardError = $true
-            
-            $errBuilder = New-Object System.Text.StringBuilder
-            $errEvent = Register-ObjectEvent -InputObject $p -EventName "ErrorDataReceived" -Action {
-                if (![string]::IsNullOrEmpty($EventArgs.Data)) { $null = $errBuilder.AppendLine($EventArgs.Data) }
+            $sourceFile = Get-Item $fFull
+            if ($sourceFile.Length -lt 2000) {
+                $sharedState.Errors.Add("[$fName] Skipped: Source file is too small or empty.") | Out-Null
+                return
             }
 
-            $null = $p.Start()
-            $p.BeginErrorReadLine()
-            
-            if (-not $p.WaitForExit($timeoutMs)) {
-                $p.Kill()
-                $p.WaitForExit(5000) | Out-Null
-                $sharedState.Errors.Add("[$fName] Timeout") | Out-Null
-            }
-            elseif ($p.ExitCode -ne 0) {
-                $sharedState.Errors.Add("[$fName] FFmpeg Error: $($errBuilder.ToString().Trim())") | Out-Null
+            $process = Start-Process -FilePath "ffmpeg" -ArgumentList @(
+                "-y", "-nostdin", "-hide_banner",
+                "-analyzeduration", "100M", "-probesize", "100M",
+                "-i", "`"$fFull`"", 
+                "-ar", $sampleRate, 
+                "-acodec", "pcm_s16le", 
+                "-ac", "1", 
+                "`"$destPath`"", 
+                "-loglevel", "error"
+            ) -NoNewWindow -PassThru -Wait
+
+            if (Test-Path $destPath) {
+                if ((Get-Item $destPath).Length -lt 1000) {
+                    $sharedState.Errors.Add("[$fName] Failed: Output is corrupt (1KB). Source may be incomplete.") | Out-Null
+                    Remove-Item $destPath -Force # 실패된(1KB) 파일 제거
+                }
+            } else {
+                $sharedState.Errors.Add("[$fName] Failed: No output generated (ExitCode: $($process.ExitCode)).") | Out-Null
             }
         }
         catch {
             $sharedState.Errors.Add("[$fName] Critical: $($_.Exception.Message)") | Out-Null
         }
         finally {
-            if ($errEvent) { 
-                Unregister-Event -SourceIdentifier $errEvent.Name
-                Remove-Job -Name $errEvent.Name -Force 
-            }
-            if ($p) { $p.Dispose() }
+            if ($process) { $process.Dispose() }
         }
     }
 
@@ -109,16 +107,14 @@ function Convert-AudioDataset {
     while ($true) {
         $doneCount = $jobs.Where({ $_.Handle.IsCompleted }).Count
         $percent = $doneCount / $totalCount
-        $padLen = [int]($percent * $BarLength)
-        $pctText = ([Math]::Round($percent * 100)).ToString().PadLeft(3)
-    
-        $detailInfo = & $dim " ($doneCount/$totalCount)"
-        $uiMsg = "`r Processing: " + $barCyan + ($fStr * $padLen) + $barEndAnsi + ($eStr * ($BarLength - $padLen)) + " " + $barCyan + $pctText + "%" + $barEndAnsi + $detailInfo
-    
-        Write-Host $uiMsg -NoNewline
+        $pctText = [Math]::Round($percent * 100)
+
+        $currentBarLen = [Math]::Min($BarLength, [int]($percent * $BarLength))
+        $bar = ($fStr * $currentBarLen).PadRight($BarLength, $eStr)
+        Write-Host ("`r Processing: $barCyan$bar$barEndAnsi $barCyan$pctText%$barEndAnsi " + (& $dim "($doneCount/$totalCount)")) -NoNewline
 
         if ($doneCount -ge $totalCount) { break }
-        Start-Sleep -Milliseconds 300
+        Start-Sleep -ms 300
     }
 
     foreach ($j in $jobs) { $null = $j.PS.EndInvoke($j.Handle); $j.PS.Dispose() }
