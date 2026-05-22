@@ -121,7 +121,7 @@ function Convert-AudioDataset {
         Write-Host ("`r Processing: $barCyan$bar$barEndAnsi $barCyan$pctText%$barEndAnsi " + (& $dim "($doneCount/$totalCount)")) -NoNewline
 
         if ($doneCount -ge $totalCount) { break }
-        Start-Sleep -ms 300
+        Start-Sleep -Milliseconds 300
     }
 
     # ── 리소스 정리 및 결과 출력 ──────────────────────────────────────────────────────
