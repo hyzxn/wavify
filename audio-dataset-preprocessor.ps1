@@ -15,8 +15,8 @@ function Convert-AudioDataset {
     }
 
     $searchPath = if ((Test-Path $SourcePath -PathType Container)) { Join-Path $SourcePath "*" } else { $SourcePath }
-    $files = Get-ChildItem -Path $searchPath -File -Include $AudioFormats | Where-Object { $_.DirectoryName -notmatch "finished\d{3}" }
-    $totalCount = @($files).Count
+    [array]$files = Get-ChildItem -Path $searchPath -File -Include $AudioFormats | Where-Object { $_.DirectoryName -notmatch "finished\d{3}" }
+    $totalCount = $files.Count
     if ($totalCount -eq 0) {
         Write-Host "Error: No files found." -ForegroundColor Red
         return
@@ -51,23 +51,32 @@ function Convert-AudioDataset {
             $p.StartInfo.UseShellExecute = $false
             $p.StartInfo.CreateNoWindow = $true
             $p.StartInfo.RedirectStandardError = $true
-            $null = $p.Start()
             
-            $errTask = $p.StandardError.ReadToEndAsync()
+            $errBuilder = New-Object System.Text.StringBuilder
+            $errEvent = Register-ObjectEvent -InputObject $p -EventName "ErrorDataReceived" -Action {
+                if (![string]::IsNullOrEmpty($EventArgs.Data)) { $null = $errBuilder.AppendLine($EventArgs.Data) }
+            }
+
+            $null = $p.Start()
+            $p.BeginErrorReadLine()
+            
             if (-not $p.WaitForExit($timeoutMs)) {
                 $p.Kill()
                 $p.WaitForExit(5000) | Out-Null
                 $sharedState.Errors.Add("[$fName] Timeout") | Out-Null
             }
             elseif ($p.ExitCode -ne 0) {
-                $errTask.Wait(2000)
-                $sharedState.Errors.Add("... $($errTask.Result.Trim())") | Out-Null
+                $sharedState.Errors.Add("[$fName] FFmpeg Error: $($errBuilder.ToString().Trim())") | Out-Null
             }
         }
         catch {
             $sharedState.Errors.Add("[$fName] Critical: $($_.Exception.Message)") | Out-Null
         }
         finally {
+            if ($errEvent) { 
+                Unregister-Event -SourceIdentifier $errEvent.Name
+                Remove-Job -Name $errEvent.Name -Force 
+            }
             if ($p) { $p.Dispose() }
         }
     }
@@ -98,7 +107,7 @@ function Convert-AudioDataset {
     $eStr = [string]$eChar
 
     while ($true) {
-        $doneCount = ($jobs | Where-Object { $_.Handle.IsCompleted }).Count
+        $doneCount = $jobs.Where({ $_.Handle.IsCompleted }).Count
         $percent = $doneCount / $totalCount
         $padLen = [int]($percent * $BarLength)
         $pctText = ([Math]::Round($percent * 100)).ToString().PadLeft(3)
