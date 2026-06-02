@@ -9,7 +9,7 @@ function Convert-AudioDataset {
 
     $startTime = Get-Date
 
-    # ── 검증 및 파일 검색 ─────────────────────────────────────────────────────────────
+    # --- 검증 및 파일 검색 ---
     if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
         Write-Host "Error: ffmpeg cannot be found." -ForegroundColor Red
         return
@@ -23,7 +23,7 @@ function Convert-AudioDataset {
         return
     }
 
-    # ── 출력 폴더 생성 및 스레드 설정 ─────────────────────────────────────────────────
+    # --- 출력 폴더 생성 및 스레드 설정 ---
     $limThreads = [Math]::Max(1, [int]($env:NUMBER_OF_PROCESSORS / 2))
     $n = 1
     do { $folderName = "finished" + $n.ToString("000"); $n++ } while (Test-Path $folderName)
@@ -40,12 +40,12 @@ function Convert-AudioDataset {
     $fChar = [char]0x2588
     $eChar = [char]0x2591
 
-    # ── 멀티스레딩(Runspace) 준비 ─────────────────────────────────────────────────────
+    # --- 멀티스레딩(Runspace) 준비 ---
     $shared = [hashtable]::Synchronized(@{ Errors = [System.Collections.Concurrent.ConcurrentBag[string]]::new() })
     $pool = [System.Management.Automation.Runspaces.RunspaceFactory]::CreateRunspacePool(1, $limThreads)
     $pool.Open()
 
-    # ── FFmpeg 변환 로직 ──────────────────────────────────────────────────────────────
+    # --- FFmpeg 변환 로직 ---
     $scriptBlock = {
         param($fFull, $fName, $destPath, $sharedState, $sampleRate, $timeoutMs)
         try {
@@ -84,7 +84,7 @@ function Convert-AudioDataset {
         }
     }
 
-    # ── 작업 대기열 등록 ──────────────────────────────────────────────────────────────
+    # --- 작업 대기열 등록 ---
     $jobs = New-Object System.Collections.Generic.List[PSCustomObject]
     $idx = 1
     $currentDir = (Get-Location).Path
@@ -107,7 +107,7 @@ function Convert-AudioDataset {
         $idx++
     }
 
-    # ── 진행률 모니터링 (UI) ──────────────────────────────────────────────────────────
+    # --- 진행률 모니터링 (UI) ---
     $fStr = [string]$fChar
     $eStr = [string]$eChar
 
@@ -124,7 +124,7 @@ function Convert-AudioDataset {
         Start-Sleep -Milliseconds 300
     }
 
-    # ── 리소스 정리 및 결과 출력 ──────────────────────────────────────────────────────
+    # --- 리소스 정리 및 결과 출력 ---
     foreach ($j in $jobs) { $null = $j.PS.EndInvoke($j.Handle); $j.PS.Dispose() }
     $pool.Close(); $pool.Dispose()
 
@@ -142,5 +142,5 @@ function Convert-AudioDataset {
     }
 }
 
-# ── 사용자 설정 ───────────────────────────────────────────────────────────────────────
+# --- 사용자 설정 ---
 Convert-AudioDataset -SampleRate 48000 -TimeoutMs 150000 -BarLength 30
