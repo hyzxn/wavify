@@ -1,7 +1,7 @@
-# Audio Dataset Preprocessor
+# Wavify
 
 [![Dependency](https://img.shields.io/badge/Dependency-FFmpeg-orange)](https://ffmpeg.org/)
-[![Release](https://img.shields.io/github/v/release/OnlyCat11/audio-dataset-preprocessor)](https://github.com/OnlyCat11/audio-dataset-preprocessor/releases/latest)
+[![Release](https://img.shields.io/github/v/release/OnlyCat11/wavify)](https://github.com/OnlyCat11/wavify/releases/latest)
 
 > An FFmpeg-based tool for preprocessing audio datasets
 
@@ -30,7 +30,7 @@
 - **Parallel Processing:** Automatically assigns half of the available CPU threads to process multiple files simultaneously.
 - **Real-time Progress Monitoring:** Displays a colored progress bar, processing status, and assigned CPU threads in the PowerShell console, along with the total processing time upon completion.
 
-<img src="./audio-dataset-preprocessor-ui.png" width="600px">
+<img src="./wavify-ui.png" width="600px">
 
 - **Verification:** Includes checks for FFmpeg installation, input file existence, and duplicate result folder prevention. Conversion errors and timeouts are collected and reported upon completion.
 
@@ -43,14 +43,14 @@
 
 ## Installation
 
-Download from the [Release](https://github.com/OnlyCat11/audio-dataset-preprocessor/releases/latest) page.
+Download from the [Release](https://github.com/OnlyCat11/wavify/releases/latest) page.
 
 **or**
 
 Clone the repository:
 
 ```bash
-git clone https://github.com/OnlyCat11/audio-dataset-preprocessor.git
+git clone https://github.com/OnlyCat11/wavify.git
 ```
 
 ## Usage
@@ -76,10 +76,10 @@ finished001/
 ## Project Structure
 
 ```text
-audio-dataset-preprocessor/
+wavify/
 ├── run.bat                             # Entry point: Executes the preprocessing pipeline
-├── audio-dataset-preprocessor.ps1      # Main logic (Requires FFmpeg): Handles conversion & batching
-├── audio-dataset-preprocessor-ui.png   # Screenshot of UI / PowerShell console progress
+├── wavify.ps1      # Main logic (Requires FFmpeg): Handles conversion & batching
+├── wavify-ui.png   # Screenshot of UI / PowerShell console progress
 ├── README.md                           # Project documentation
 ├── LICENSE                             # License file (MIT)
 └── .gitignore                          # Git ignore rules
@@ -106,7 +106,7 @@ audio-dataset-preprocessor/
 - **Parallel Processing:** 가용 CPU 스레드의 절반을 자동으로 할당하여 여러 파일을 동시에 처리합니다.
 - **Real-time Progress Monitoring:** PowerShell 터미널에서 컬러 Progress Bar, 진행률, 할당된 CPU 스레드 수를 표시합니다. 또한 완료 시 총 처리 시간도 출력됩니다.
 
-<img src="./audio-dataset-preprocessor-ui.png" width="600px">
+<img src="./wavify-ui.png" width="600px">
 
 - **Verification:** FFmpeg 설치 여부, 입력 파일 존재 확인 및 결과 폴더 중복 방지 로직을 포함합니다. 변환 실패 및 타임아웃 에러는 완료 시 일괄 출력됩니다.
 
@@ -119,14 +119,14 @@ audio-dataset-preprocessor/
 
 ## 설치 방법 (Installation)
 
-[Release](https://github.com/OnlyCat11/audio-dataset-preprocessor/releases/latest) 페이지에서 다운로드합니다.
+[Release](https://github.com/OnlyCat11/wavify/releases/latest) 페이지에서 다운로드합니다.
 
 **또는**
 
 저장소를 클론합니다.
 
 ```bash
-git clone https://github.com/OnlyCat11/audio-dataset-preprocessor.git
+git clone https://github.com/OnlyCat11/wavify.git
 ```
 
 ## 사용법 (Usage)
@@ -152,10 +152,10 @@ finished001/
 ## 프로젝트 구조 (Project Structure)
 
 ```text
-audio-dataset-preprocessor/
+wavify/
 ├── run.bat                              # 실행 파일: 전처리 파이프라인 즉시 실행
-├── audio-dataset-preprocessor.ps1       # 메인 로직 (FFmpeg 설치 필요): 오디오 변환 및 배치 처리 담당
-├── audio-dataset-preprocessor-ui.png    # 스크린샷: 인터페이스 및 진행 상황 예시
+├── wavify.ps1       # 메인 로직 (FFmpeg 설치 필요): 오디오 변환 및 배치 처리 담당
+├── wavify-ui.png    # 스크린샷: 인터페이스 및 진행 상황 예시
 ├── README.md                            # 프로젝트 설명서
 ├── LICENSE                              # 라이선스 파일 (MIT)
 └── .gitignore                           # Git 관리 제외 대상 설정
