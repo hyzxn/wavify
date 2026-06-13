@@ -3,9 +3,9 @@
 [![Dependency](https://img.shields.io/badge/Dependency-FFmpeg-orange)](https://ffmpeg.org/)
 [![Release](https://img.shields.io/github/v/release/OnlyCat11/wavify)](https://github.com/OnlyCat11/wavify/releases/latest)
 
-> An FFmpeg-based tool for preprocessing audio datasets
+> An FFmpeg-based CLI tool for preprocessing audio datasets
 
-> FFmpeg 기반 오디오 데이터셋 전처리기
+> FFmpeg 기반 CLI 오디오 데이터셋 전처리 도구
 
 [English](#english) | [한국어](#korean)
 
